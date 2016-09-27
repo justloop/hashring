@@ -47,7 +47,7 @@ func NewWithWeights(weights map[string]int) *HashRing {
 	return hashRing
 }
 
-func (h *HashRing) GetNodes() []string {
+func (h *HashRing) GetRingNodes() []string {
 	return h.nodes	
 }
 
