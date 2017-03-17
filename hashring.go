@@ -19,6 +19,7 @@ type HashRing struct {
 	sortedKeys []HashKey
 	nodes      []string
 	weights    map[string]int
+	keyHashFunc func(key string) uint32
 }
 
 func New(nodes []string) *HashRing {
@@ -29,6 +30,12 @@ func New(nodes []string) *HashRing {
 		weights:    make(map[string]int),
 	}
 	hashRing.generateCircle()
+	return hashRing
+}
+
+func NewWithHash(nodes []string,keyHashFunc func(key string) uint32) *HashRing {
+	hashRing := New(nodes)
+	hashRing.keyHashFunc = keyHashFunc
 	return hashRing
 }
 
@@ -47,8 +54,14 @@ func NewWithWeights(weights map[string]int) *HashRing {
 	return hashRing
 }
 
+func NewWithWeightsHash(weights map[string]int,keyHashFunc func(key string) uint32) *HashRing {
+	hashRing := NewWithWeights(weights)
+	hashRing.keyHashFunc = keyHashFunc
+	return hashRing
+}
+
 func (h *HashRing) GetRingNodes() []string {
-	return h.nodes	
+	return h.nodes
 }
 
 func (h *HashRing) UpdateWithWeights(weights map[string]int) {
@@ -135,6 +148,12 @@ func (h *HashRing) GetNodePos(stringKey string) (pos int, ok bool) {
 }
 
 func (h *HashRing) GenKey(key string) HashKey {
+	if h.keyHashFunc != nil {
+		hash := h.keyHashFunc(key)
+		if hash != 0 {
+			return HashKey(hash)
+		}
+	}
 	bKey := hashDigest(key)
 	return hashVal(bKey[0:4])
 }
