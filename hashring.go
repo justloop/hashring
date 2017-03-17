@@ -15,10 +15,10 @@ func (h HashKeyOrder) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
 func (h HashKeyOrder) Less(i, j int) bool { return h[i] < h[j] }
 
 type HashRing struct {
-	ring       map[HashKey]string
-	sortedKeys []HashKey
-	nodes      []string
-	weights    map[string]int
+	ring        map[HashKey]string
+	sortedKeys  []HashKey
+	nodes       []string
+	weights     map[string]int
 	keyHashFunc func(key string) uint32
 }
 
@@ -33,7 +33,7 @@ func New(nodes []string) *HashRing {
 	return hashRing
 }
 
-func NewWithHash(nodes []string,keyHashFunc func(key string) uint32) *HashRing {
+func NewWithHash(nodes []string, keyHashFunc func(key string) uint32) *HashRing {
 	hashRing := New(nodes)
 	hashRing.keyHashFunc = keyHashFunc
 	return hashRing
@@ -41,7 +41,7 @@ func NewWithHash(nodes []string,keyHashFunc func(key string) uint32) *HashRing {
 
 func NewWithWeights(weights map[string]int) *HashRing {
 	nodes := make([]string, 0, len(weights))
-	for node, _ := range weights {
+	for node := range weights {
 		nodes = append(nodes, node)
 	}
 	hashRing := &HashRing{
@@ -54,7 +54,7 @@ func NewWithWeights(weights map[string]int) *HashRing {
 	return hashRing
 }
 
-func NewWithWeightsHash(weights map[string]int,keyHashFunc func(key string) uint32) *HashRing {
+func NewWithWeightsHash(weights map[string]int, keyHashFunc func(key string) uint32) *HashRing {
 	hashRing := NewWithWeights(weights)
 	hashRing.keyHashFunc = keyHashFunc
 	return hashRing
@@ -213,10 +213,11 @@ func (h *HashRing) AddWeightedNode(node string, weight int) *HashRing {
 	weights[node] = weight
 
 	hashRing := &HashRing{
-		ring:       make(map[HashKey]string),
-		sortedKeys: make([]HashKey, 0),
-		nodes:      nodes,
-		weights:    weights,
+		ring:        make(map[HashKey]string),
+		sortedKeys:  make([]HashKey, 0),
+		nodes:       nodes,
+		weights:     weights,
+		keyHashFunc: h.keyHashFunc,
 	}
 	hashRing.generateCircle()
 	return hashRing
@@ -242,10 +243,11 @@ func (h *HashRing) UpdateWeightedNode(node string, weight int) *HashRing {
 	weights[node] = weight
 
 	hashRing := &HashRing{
-		ring:       make(map[HashKey]string),
-		sortedKeys: make([]HashKey, 0),
-		nodes:      nodes,
-		weights:    weights,
+		ring:        make(map[HashKey]string),
+		sortedKeys:  make([]HashKey, 0),
+		nodes:       nodes,
+		weights:     weights,
+		keyHashFunc: h.keyHashFunc,
 	}
 	hashRing.generateCircle()
 	return hashRing
@@ -271,10 +273,11 @@ func (h *HashRing) RemoveNode(node string) *HashRing {
 	}
 
 	hashRing := &HashRing{
-		ring:       make(map[HashKey]string),
-		sortedKeys: make([]HashKey, 0),
-		nodes:      nodes,
-		weights:    weights,
+		ring:        make(map[HashKey]string),
+		sortedKeys:  make([]HashKey, 0),
+		nodes:       nodes,
+		weights:     weights,
+		keyHashFunc: h.keyHashFunc,
 	}
 	hashRing.generateCircle()
 	return hashRing
